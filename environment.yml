@@ -1,0 +1,10 @@
+name: job_scraper
+channels:
+  - plotly
+  - anaconda
+  - conda-forge
+dependencies:
+  - pandas
+  - selenium=4.19.0
+  - fake-useragent
+  - beautifulsoup4
