@@ -1,7 +1,7 @@
 # Job Scraper
 This repository contains scripts, that will scrape the job postings available on the platforms [Stepstone](stepstone.de), [GastroJobs](gastrojobs.de) and [HotelCareer](hotelcareer.de). The retrieved data will be stored in tables and can be used for future analysis.
 
-# Installation Guide
+# Installation
 ## Step 1: Clone the repository
 1. If not already installed, first [install](https://git-scm.com/download/win) git on your local machine.
 2. Open the command prompt or terminal in your IDE
@@ -16,5 +16,14 @@ The repository will now be cloned to your local machine into the current folder.
 2. Run the following command to create a new conda environment: \
 ```conda env create -f environment.yml```
 3. Activate the newly created environment: \
-```conda activate scraper```
+```conda activate job_scraper```
+
+# Usage
+Currently you have to run the scrapers seperately for each platform and each country.
+1. Specify the location in each script by setting the ```location``` variable to `` "Deutschland" `` or `` "Österreich" ``.
+2. Run the file using the command line (e.g for Gastrojobs): \
+    ```python scraper_gastrojobs.py```
+
+    
+
 
