@@ -93,7 +93,10 @@ while True:
         location.append(result.find("li", {"class": "location"}).get_text().strip())
         job_type.append(result.find("li", {"class": "info"}).get_text().strip())
         date.append(result.find("li", {"class": "date"}).get_text().strip())
-        snippet.append(result.find("div", {"class": "snippet"}).get_text().strip())
+        if result.find("div", {"class": "snippet"}):
+            snippet.append(result.find("div", {"class": "snippet"}).get_text().strip())
+        else:
+            snippet.append("")
         id.append(result["ang"])
     if (
         len(driver.find_elements(By.CLASS_NAME, "weiter")) > 0
