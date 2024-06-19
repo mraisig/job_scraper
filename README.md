@@ -12,11 +12,21 @@ This repository contains scripts, that will scrape the job postings available on
 The repository will now be cloned to your local machine into the current folder.
 
 ## Step 2: Create environment
+### Using conda/mamba
 1. If not already installed, download and install a distribution of conda or mamba.
 2. Run the following command to create a new conda environment: \
 ```conda env create -f environment.yml```
 3. Activate the newly created environment: \
 ```conda activate job_scraper```
+
+### Using pip
+1. To create a virtual environment, go to your project’s directory and run the following command. This will create a new virtual environment in a local folder named ```.job_scraper``` : \
+```python -m venv .job_scraper```
+2. Activate the newly created environment using: \
+```.job_scraper\Scripts\activate ```
+3. To install all required packages into the newly created environment run the following in your command line: \
+```python -m pip install -r requirements.txt``` 
+
 
 # Usage
 Currently you have to run the scrapers seperately for each platform and each country.
