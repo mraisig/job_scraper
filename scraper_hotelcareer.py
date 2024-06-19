@@ -54,9 +54,16 @@ except NoSuchElementException:
     print("Could not click")
     pass
 
+time.sleep(10)
+
 # Set location
-input_ort = driver.find_element(By.ID, "input_ort")
-input_ort.send_keys(location + Keys.ENTER)
+# Does not work starting from 19.6.2024
+#input_ort = driver.find_element(By.ID, "input_ort")
+#input_ort.send_keys(location + Keys.ENTER)
+
+driver.execute_script(("document.getElementById('input_ort').value=arguments[0]"), location)
+wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='btnSearch_new']"))).click()
+
 
 # Close pop-up
 try:
