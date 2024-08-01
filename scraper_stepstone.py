@@ -14,20 +14,19 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import chromedriver_autoinstaller
 
+
 def main(location_input):
     # Check if the current version of chromedriver exists and if it doesn't exist, download it automatically, then add chromedriver to path
-    chromedriver_autoinstaller.install(cwd = True)    
-
+    chromedriver_autoinstaller.install(cwd=True)
 
     # Set up parameters for file export
     portal = "stepstone"
-    scraping_date = time.strftime('%d_%m_%Y')
+    scraping_date = time.strftime("%d_%m_%Y")
     location_input = location_input
     if location_input == "Deutschland":
         country = "DE"
     elif location_input == "Österreich":
         country = "AT"
-
 
     # Initialize a fake user agent so scraping is harder to detect
     options = Options()
@@ -46,13 +45,12 @@ def main(location_input):
     driver.get("https://www.stepstone.de")  # Specify URL to scrape
     wait = WebDriverWait(driver, 30)
 
-    print(driver.capabilities['browserVersion'])
-    print(driver.capabilities['chrome']['chromedriverVersion'].split(' ')[0])
     # Accept cookies
     try:
-        wait.until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[11]/section/div/section/div[2]/div[1]/div[2]/div/div"))
-        ).click()
+        element = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//div[text()='Alles akzeptieren']"))
+        )
+        driver.execute_script("arguments[0].click();", element)
         print("Clicked successfully")
     except NoSuchElementException:
         print("Could not click")
@@ -76,15 +74,27 @@ def main(location_input):
         soup = BeautifulSoup(html, "html.parser")
         results = soup.find_all("article", {"data-at": "job-item"})
         for result in results:
-            job_title.append(result.find("a", {"data-at": "job-item-title"}).get_text().strip())
-            company_info.append(result.find("span", {"data-at" : "job-item-company-name"}).get_text().strip())
-            location.append(result.find("span", {"data-at": "job-item-location"}).get_text().strip())
-            date.append(result.find("time")['datetime'])
+            job_title.append(
+                result.find("a", {"data-at": "job-item-title"}).get_text().strip()
+            )
+            company_info.append(
+                result.find("span", {"data-at": "job-item-company-name"})
+                .get_text()
+                .strip()
+            )
+            location.append(
+                result.find("span", {"data-at": "job-item-location"}).get_text().strip()
+            )
+            date.append(result.find("time")["datetime"])
             if result.find("div", {"data-at": "jobcard-content"}):
-                snippet.append(result.find("div", {"data-at": "jobcard-content"}).get_text().strip())
+                snippet.append(
+                    result.find("div", {"data-at": "jobcard-content"})
+                    .get_text()
+                    .strip()
+                )
             else:
                 snippet.append("")
-            id.append(result['id'])
+            id.append(result["id"])
             if result.find("span", {"data-at": "job-item-work-from-home"}):
                 home_office.append(1)
             else:
@@ -93,7 +103,11 @@ def main(location_input):
             len(driver.find_elements(By.CSS_SELECTOR, "[aria-label='Nächste']")) > 0
         ):  # run loop until there are no more pages left
             try:
-                wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "[aria-label='Nächste']"))).click()
+                wait.until(
+                    EC.element_to_be_clickable(
+                        (By.CSS_SELECTOR, "[aria-label='Nächste']")
+                    )
+                ).click()
                 print(f"Clicked successfully to: {page+1}")
                 page += 1
             except TimeoutException:
@@ -107,11 +121,11 @@ def main(location_input):
             "company_info": company_info,
             "location": location,
             "date": date,
-            "snippet" : snippet,
+            "snippet": snippet,
             "home_office": home_office,
-            "id" : id,
-            "country" : country,
-            "portal" : portal
+            "id": id,
+            "country": country,
+            "portal": portal,
         }
     )
 
@@ -120,6 +134,7 @@ def main(location_input):
     df.to_csv(filename_output + ".csv", index=False)
 
     return filename_output + ".csv"
+
 
 if __name__ == "__main__":
     main()
