@@ -51,9 +51,10 @@ def main(location_input):
                 (By.XPATH, "//iframe[starts-with(@id,'sp_message_iframe')]")
             )
         )
-        wait.until(
+        element = wait.until(
             EC.element_to_be_clickable((By.XPATH, "//button[text()='Zustimmen']"))
-        ).click()
+        )
+        driver.execute_script("arguments[0].click();", element)
         print("Clicked successfully")
     except NoSuchElementException:
         print("Could not click")
