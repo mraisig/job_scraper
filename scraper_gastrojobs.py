@@ -35,6 +35,7 @@ def main(location_input):
     print(user_agent)
     options.add_argument(f"user-agent={user_agent}")
     options.add_argument("--headless=new")
+    options.add_argument("--disable-search-engine-choice-screen")
 
 
     # Initialize WebDriver
@@ -65,10 +66,6 @@ def main(location_input):
     time.sleep(10)
 
     # Set location
-    # Does not work starting from 19.6.2024
-    #input_ort = driver.find_element(By.ID, "input_ort")
-    #input_ort.send_keys(location + Keys.ENTER)
-
     driver.execute_script(("document.getElementById('input_ort').value=arguments[0]"), location_input)
     wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='btnSearch_new']"))).click()
 
