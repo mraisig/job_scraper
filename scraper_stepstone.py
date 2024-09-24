@@ -67,7 +67,7 @@ def main(location_input):
     snippet = []
     id = []
     page = 1
-
+    max_page = int(driver.find_element(By.CSS_SELECTOR, "li.res-1b3es54:nth-child(8) > a:nth-child(1) > span:nth-child(1) > span:nth-child(1) > span:nth-child(1)").text)
     while True:
         time.sleep(10)
         html = driver.page_source
@@ -85,7 +85,10 @@ def main(location_input):
             location.append(
                 result.find("span", {"data-at": "job-item-location"}).get_text().strip()
             )
-            date.append(result.find("time")["datetime"])
+            if result.find("time")["datetime"]:
+                date.append(result.find("time")["datetime"])
+            else:
+                date.append("")
             if result.find("div", {"data-at": "jobcard-content"}):
                 snippet.append(
                     result.find("div", {"data-at": "jobcard-content"})
@@ -99,15 +102,14 @@ def main(location_input):
                 home_office.append(1)
             else:
                 home_office.append(0)
-        if (
-            len(driver.find_elements(By.CSS_SELECTOR, "[aria-label='Nächste']")) > 0
-        ):  # run loop until there are no more pages left
+        if page <= max_page:  # run loop until there are no more pages left
             try:
-                wait.until(
+                element = wait.until(
                     EC.element_to_be_clickable(
                         (By.CSS_SELECTOR, "[aria-label='Nächste']")
                     )
-                ).click()
+                )
+                driver.execute_script("arguments[0].click();", element)
                 print(f"Clicked successfully to: {page+1}")
                 page += 1
             except TimeoutException:
