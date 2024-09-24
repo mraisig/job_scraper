@@ -5,19 +5,20 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import chromedriver_autoinstaller
+import logging
 
+# Initialize logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='stepstone.log', filemode = 'w', encoding='utf-8', level = logging.INFO, format='%(levelname)s: [%(filename)s:%(lineno)d]: %(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
 def main(location_input):
     # Check if the current version of chromedriver exists and if it doesn't exist, download it automatically, then add chromedriver to path
-    chromedriver_autoinstaller.install(cwd=True)
+    chromedriver_path = chromedriver_autoinstaller.install(cwd = True)
 
     # Set up parameters for file export
     portal = "stepstone"
@@ -37,27 +38,17 @@ def main(location_input):
     options.add_argument("--headless=new")
 
     # Initialize WebDriver
-    service = Service(executable_path="chromedriver.exe")
+    service = Service(executable_path=chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
     driver.implicitly_wait(10)
 
     driver.maximize_window()
     driver.get("https://www.stepstone.de")  # Specify URL to scrape
-    wait = WebDriverWait(driver, 30)
 
-    # Accept cookies
-    try:
-        element = wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//div[text()='Alles akzeptieren']"))
-        )
-        driver.execute_script("arguments[0].click();", element)
-        print("Clicked successfully")
-    except NoSuchElementException:
-        print("Could not click")
-        pass
-
-    input_ort = driver.find_element(By.ID, "stepstone-autocomplete-155")
-    input_ort.send_keys(location_input + Keys.ENTER)
+    if location_input == "Deutschland":
+        driver.get("https://www.stepstone.de/jobs/in-deutschland?radius=30&page=1&sort=2&action=sort_publish")  # Specify URL to scrape
+    else:
+        driver.get("https://www.stepstone.de/jobs/in-Österreich?radius=30&page=1&sort=2&action=sort_publish")
 
     job_title = []
     company_info = []
@@ -104,14 +95,13 @@ def main(location_input):
                 home_office.append(0)
         if page <= max_page:  # run loop until there are no more pages left
             try:
-                element = wait.until(
-                    EC.element_to_be_clickable(
-                        (By.CSS_SELECTOR, "[aria-label='Nächste']")
-                    )
-                )
-                driver.execute_script("arguments[0].click();", element)
-                print(f"Clicked successfully to: {page+1}")
                 page += 1
+                if location_input == "Deutschland":
+                    driver.get(f"https://www.stepstone.de/jobs/in-deutschland?radius=30&page={page}&sort=2&action=sort_publish")
+                else:
+                    driver.get(f"https://www.stepstone.de/jobs/in-Österreich?radius=30&page={page}&sort=2&action=sort_publish")
+                print(f"Clicked successfully to: {page}")
+                logger.info("Reached page: %s and got %s jobs",  page, len(job_title))
             except TimeoutException:
                 break
         else:
